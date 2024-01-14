@@ -3,6 +3,7 @@ import StarContext from './context';
 
 function StarProvider({ children }: { children: React.ReactNode }) {
   const [starData, setStarData] = useState([]);
+  const [planetFilter, setPlanetFilter] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -17,7 +18,13 @@ function StarProvider({ children }: { children: React.ReactNode }) {
     fetchData();
   }, []);
 
-  return <StarContext.Provider value={ { starData } }>{children}</StarContext.Provider>;
+  return (
+    <StarContext.Provider
+      value={ { starData, planetFilter, setPlanetFilter } }
+    >
+      {children}
+    </StarContext.Provider>
+  );
 }
 
 export default StarProvider;

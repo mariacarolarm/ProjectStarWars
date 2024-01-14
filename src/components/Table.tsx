@@ -7,29 +7,46 @@ type PlanetProp = {
 };
 
 function StarTable() {
-  const { starData } = useContext(StarContext);
+  const { starData, planetFilter, setPlanetFilter } = useContext(StarContext);
 
   const keys = Object.keys(starData[0] || {});
 
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPlanetFilter(event.target.value);
+  };
+
+  const filteredStarData = starData
+    .filter((planet: PlanetProp) => planet.name.toLowerCase()
+      .includes(planetFilter.toLowerCase()));
+
   return (
-    <table>
-      <thead>
-        <tr>
-          {keys.map((key) => (
-            <th key={ key }>{key}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {starData.map((planet: PlanetProp) => (
-          <tr key={ planet.name }>
+    <>
+      <h1>Projeto Star Wars - Trybe</h1>
+      <input
+        type="text"
+        data-testid="name-filter"
+        value={ planetFilter }
+        onChange={ handleChange }
+      />
+      <table>
+        <thead>
+          <tr>
             {keys.map((key) => (
-              <td key={ key }>{planet[key]}</td>
+              <th key={ key }>{key}</th>
             ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {filteredStarData.map((planet: PlanetProp) => (
+            <tr key={ planet.name }>
+              {keys.map((key) => (
+                <td key={ key }>{planet[key]}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
   );
 }
 
