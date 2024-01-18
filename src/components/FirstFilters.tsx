@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import StarContext from '../context/context';
 import { PlanetProp } from '../types/types';
 
@@ -8,6 +8,8 @@ const comparisonOptions = ['maior que', 'menor que', 'igual a'];
 
 function FirstFilters() {
   const { starData, setPlanetFilter, setFilteredData } = useContext(StarContext);
+  const [filters, setFilters] = useState<{ filter: string;
+    comparison: string; value: string }[]>([]);
   const [selectedFilter, setSelectedFilter] = useState('population');
   const [selectedComparison, setSelectedComparison] = useState('maior que');
   const [filterValue, setFilterValue] = useState('0');
@@ -26,26 +28,36 @@ function FirstFilters() {
   };
 
   const handleFilter = () => {
+    const newFilter = {
+      filter: selectedFilter,
+      comparison: selectedComparison,
+      value: filterValue,
+    };
+
+    setFilters((prevFilters) => [...prevFilters, newFilter]);
+  };
+
+  useEffect(() => {
     const filteredData = starData.filter((planet: PlanetProp) => {
-      const planetValue = parseInt(planet[selectedFilter], 10);
-      const inputValue = parseInt(filterValue, 10);
+      return filters.every((filter) => {
+        const planetValue = parseInt(planet[filter.filter], 10);
+        const inputValue = parseInt(filter.value, 10);
 
-      if (selectedComparison === 'maior que') {
-        return planetValue > inputValue;
-      } if (selectedComparison === 'menor que') {
-        return planetValue < inputValue;
-      } if (selectedComparison === 'igual a') {
-        return planetValue === inputValue;
-      }
+        if (filter.comparison === 'maior que') {
+          return planetValue > inputValue;
+        } if (filter.comparison === 'menor que') {
+          return planetValue < inputValue;
+        } if (filter.comparison === 'igual a') {
+          return planetValue === inputValue;
+        }
 
-      return true;
+        return true;
+      });
     });
 
     setFilteredData(filteredData);
     setPlanetFilter('');
-  };
-
-  const filters = `${selectedFilter} ${selectedComparison} ${filterValue}`;
+  }, [filters, starData, setFilteredData, setPlanetFilter]);
 
   return (
     <div>
@@ -87,7 +99,16 @@ function FirstFilters() {
       >
         Filtrar
       </button>
-      <p data-testid="column-filter-value">{filters}</p>
+
+      {filters.map((filter, index) => (
+        <div key={ index }>
+          {filter.filter}
+          {' '}
+          {filter.comparison}
+          {' '}
+          {filter.value}
+        </div>
+      ))}
     </div>
   );
 }
