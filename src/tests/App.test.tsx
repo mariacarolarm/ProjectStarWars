@@ -19,13 +19,13 @@ it('Testa se existe um input no App', () => {
 })
 })
 
-/*describe('Teste de filtragens', () => {
+describe('Teste de filtragens', () => {
   it('Testa filtragem por nome no input', async () => {
     renderWithContext(<App />)
     const input = screen.getByTestId('name-filter')
     await userEvent.type(input, 'oo')
 
-    await waitFor(() => {
+    waitFor(() => {
       const naboo = screen.getByRole('cell', {
         name: /naboo/i
       })
@@ -45,11 +45,11 @@ it('Testa se existe um input no App', () => {
     await userEvent.selectOptions(selectComparison, 'maior que')
     await userEvent.type(inputValue, '1000000')
     await userEvent.click(buttonFilter)
-    await waitFor(() => {
+    waitFor(() => {
       const naboo = screen.getByRole('cell', {
         name: /naboo/i
       })
     expect(naboo).toBeInTheDocument();
 })
 })
-*/
+
