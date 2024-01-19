@@ -1,18 +1,19 @@
-import { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import StarContext from '../context/context';
 import { PlanetProp } from '../types/types';
 
-const filterOptions = ['population', 'orbital_period',
-  'diameter', 'rotation_period', 'surface_water'];
 const comparisonOptions = ['maior que', 'menor que', 'igual a'];
 
 function FirstFilters() {
   const { starData, setPlanetFilter, setFilteredData } = useContext(StarContext);
-  const [filters, setFilters] = useState<{ filter: string;
-    comparison: string; value: string }[]>([]);
-  const [selectedFilter, setSelectedFilter] = useState('population');
+  const [filterSets, setFilterSets] = useState<{ filter: string;
+    comparison: string; value: string }[][]>([]);
   const [selectedComparison, setSelectedComparison] = useState('maior que');
   const [filterValue, setFilterValue] = useState('0');
+  const [filterOptions, setFilterOptions] = useState(['population', 'orbital_period',
+    'diameter', 'rotation_period', 'surface_water']);
+  const [selectedFilter, setSelectedFilter] = useState(filterOptions[0]);
+  const [usedFilters, setUsedFilters] = useState<string[]>([]);
 
   const handleFilterChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
@@ -34,12 +35,24 @@ function FirstFilters() {
       value: filterValue,
     };
 
-    setFilters((prevFilters) => [...prevFilters, newFilter]);
+    if (!usedFilters.includes(selectedFilter)) {
+      setUsedFilters((prevUsedFilters) => [...prevUsedFilters, selectedFilter]);
+      setFilterOptions((prevOptions) => prevOptions
+        .filter((option) => option !== selectedFilter));
+
+      setFilterSets((prevFilterSets) => [...prevFilterSets, [newFilter]]);
+    }
   };
 
   useEffect(() => {
+    setSelectedFilter(filterOptions[0]);
+  }, [usedFilters]);
+
+  useEffect(() => {
+    const combinedFilters = filterSets.reduce((acc, filters) => acc.concat(filters), []);
+
     const filteredData = starData.filter((planet: PlanetProp) => {
-      return filters.every((filter) => {
+      return combinedFilters.every((filter) => {
         const planetValue = parseInt(planet[filter.filter], 10);
         const inputValue = parseInt(filter.value, 10);
 
@@ -57,7 +70,7 @@ function FirstFilters() {
 
     setFilteredData(filteredData);
     setPlanetFilter('');
-  }, [filters, starData, setFilteredData, setPlanetFilter]);
+  }, [filterSets, starData, setFilteredData, setPlanetFilter]);
 
   return (
     <div>
@@ -100,13 +113,17 @@ function FirstFilters() {
         Filtrar
       </button>
 
-      {filters.map((filter, index) => (
-        <div key={ index }>
-          {filter.filter}
-          {' '}
-          {filter.comparison}
-          {' '}
-          {filter.value}
+      {filterSets.map((filters, setIndex) => (
+        <div key={ setIndex }>
+          {filters.map((filter, index) => (
+            <div key={ index }>
+              {filter.filter}
+              {' '}
+              {filter.comparison}
+              {' '}
+              {filter.value}
+            </div>
+          ))}
         </div>
       ))}
     </div>
