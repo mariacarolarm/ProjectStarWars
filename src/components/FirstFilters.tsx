@@ -35,18 +35,44 @@ function FirstFilters() {
       value: filterValue,
     };
 
+    // Check if the selected filter is not already used
     if (!usedFilters.includes(selectedFilter)) {
+      // Update used filters and available options
       setUsedFilters((prevUsedFilters) => [...prevUsedFilters, selectedFilter]);
       setFilterOptions((prevOptions) => prevOptions
         .filter((option) => option !== selectedFilter));
 
+      // Apply the new filter
       setFilterSets((prevFilterSets) => [...prevFilterSets, [newFilter]]);
     }
+
+    // Reset selectedFilter to the default option
+    setSelectedFilter(filterOptions[0]);
   };
 
-  useEffect(() => {
-    setSelectedFilter(filterOptions[0]);
-  }, [usedFilters]);
+  const handleExcludeFilter = (index: number) => {
+    // Get the excluded filter
+    const excludedFilter = filterSets[index][0].filter;
+
+    // Remove the filter from used filters
+    setUsedFilters((prevUsedFilters) => prevUsedFilters
+      .filter((filter) => filter !== excludedFilter));
+
+    // Add the excluded filter back to available options
+    setFilterOptions((prevOptions) => [...prevOptions, excludedFilter]);
+
+    // Remove the filter set from the list
+    setFilterSets((prevFilterSets) => prevFilterSets.filter((_, i) => i !== index));
+  };
+
+  const handleRemoveAllFilters = () => {
+    // Reset used filters and available options
+    setUsedFilters([]);
+    setFilterOptions(filterOptions);
+
+    // Remove all filter sets
+    setFilterSets([]);
+  };
 
   useEffect(() => {
     const combinedFilters = filterSets.reduce((acc, filters) => acc.concat(filters), []);
@@ -116,16 +142,25 @@ function FirstFilters() {
       {filterSets.map((filters, setIndex) => (
         <div key={ setIndex }>
           {filters.map((filter, index) => (
-            <div key={ index }>
+            <div data-testid="filter" key={ index }>
               {filter.filter}
               {' '}
               {filter.comparison}
               {' '}
               {filter.value}
+              <button onClick={ () => handleExcludeFilter(setIndex) }>Excluir</button>
             </div>
           ))}
         </div>
       ))}
+
+      <button
+        data-testid="button-remove-filters"
+        onClick={ handleRemoveAllFilters }
+      >
+        Remover todas filtragens
+
+      </button>
     </div>
   );
 }
