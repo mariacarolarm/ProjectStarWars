@@ -2,6 +2,7 @@ import { useContext, useEffect } from 'react';
 import StarContext from '../context/context';
 import { PlanetProp } from '../types/types';
 import FirstFilters from './FirstFilters';
+import SortFilters from './SortFilters';
 
 function StarTable() {
   const { starData, planetFilter,
@@ -33,6 +34,7 @@ function StarTable() {
         onChange={ handleChange }
       />
       <FirstFilters />
+      <SortFilters />
       <table>
         <thead>
           <tr>
@@ -45,7 +47,12 @@ function StarTable() {
           {filteredStarData.map((planet: PlanetProp) => (
             <tr key={ planet.name }>
               {keys.map((key) => (
-                <td key={ key }>{planet[key]}</td>
+                <td
+                  key={ key }
+                  data-testid={ key === 'name' ? 'planet-name' : undefined }
+                >
+                  {planet[key]}
+                </td>
               ))}
             </tr>
           ))}
